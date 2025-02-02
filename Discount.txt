@@ -1,0 +1,3 @@
+Campus Cravings Discounts
+inital Discount logic
+10% off $20+ meal
