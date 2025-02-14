@@ -1,10 +1,10 @@
 # Campus_Cravings
 Campus Cravings Software Demo
 
+
 ## Installation Instructions ⚙️​
 
 To get started with the **Campus Cravings** app:​
-
 
 
 1. **Clone the Repository:**​
@@ -38,12 +38,7 @@ To get started with the **Campus Cravings** app:​
    npm start​
 
    ```​
-
-​
-
----​
-
-​
+   
 
 ## Codebase Structure 🏗️​
 
@@ -79,11 +74,6 @@ Campus-Cravings/​
 
 ```​
 
-​
-
----​
-
-​
 
 ## Usage Guide 📚​
 
