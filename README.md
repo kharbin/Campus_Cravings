@@ -92,7 +92,7 @@ To use the **Campus Cravings** app:​
 
 ​
 
-** ## Configuration ⚙️ ​**
+ ## Configuration ⚙️ 
 
 ​
 If you'd like to configure the app for your specific needs:​
