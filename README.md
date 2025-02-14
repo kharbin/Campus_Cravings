@@ -68,7 +68,7 @@ Campus-Cravings/​
 
 │── .gitignore​
 
-```​
+```
 
 ## Usage Guide 📚​
 
