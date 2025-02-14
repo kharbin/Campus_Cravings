@@ -71,7 +71,6 @@ Campus-Cravings/​
 ```​
 
 ## Usage Guide 📚​
-## Usage Guide 📚​
 
 To use the **Campus Cravings** app:​
 
