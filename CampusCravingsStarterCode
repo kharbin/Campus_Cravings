@@ -1,0 +1,176 @@
+import pygame
+import asyncio
+import platform
+
+# Initialize Pygame
+pygame.init()
+
+# Screen dimensions
+WIDTH = 800
+HEIGHT = 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Campus Cravings")
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
+BLUE = (50, 150, 255)
+
+# Font
+font = pygame.font.Font(None, 36)
+
+# Restaurant data from the schedules
+restaurants = [
+    {"name": "Acre Provisions", "schedule": {"Mon": "8am-12am", "Tue": "8am-12am", "Wed": "8am-12am", "Thu": "8am-12am", "Fri": "8am-10pm", "Sat": "3-10pm", "Sun": "3pm-12am"}, "meal_exchange": "No"},
+    {"name": "Amicus Cafe", "schedule": {"Mon": "7am-2pm", "Tue": "7am-2pm", "Wed": "7am-2pm", "Thu": "7am-2pm", "Fri": "7am-2pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "Baja Fresh Express", "schedule": {"Mon": "10am-4pm", "Tue": "10am-4pm", "Wed": "10am-4pm", "Thu": "10am-4pm", "Fri": "10am-4pm", "Sat": "-", "Sun": "2-4pm"}, "meal_exchange": "Yes"},
+    {"name": "Basic Knead", "schedule": {"Mon": "1pm-12am", "Tue": "1pm-12am", "Wed": "1pm-12am", "Thu": "1pm-12am", "Fri": "1-10pm", "Sat": "-", "Sun": "4pm-12am (limited menu after 9pm)"}, "meal_exchange": "Yes"},
+    {"name": "The Bookmark", "schedule": {"Mon": "7:30am-8pm", "Tue": "7:30am-8pm", "Wed": "7:30am-8pm", "Thu": "7:30am-8pm", "Fri": "7:30am-3pm", "Sat": "-", "Sun": "1-8pm"}, "meal_exchange": "2pm-CLOSE"},
+    {"name": "Brickwalk Bites", "schedule": {"Mon": "-", "Tue": "6-10pm", "Wed": "-", "Thu": "6-10pm", "Fri": "-", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "Cafe 201", "schedule": {"Mon": "7:45am-2pm", "Tue": "7:45am-2pm", "Wed": "7:45am-2pm", "Thu": "7:45am-2pm", "Fri": "7:45am-2pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "Chick-fil-A", "schedule": {"Mon": "10am-6pm", "Tue": "10am-6pm", "Wed": "10am-6pm", "Thu": "10am-6pm", "Fri": "10am-5pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "2-6pm"},
+    {"name": "Couch Restaurants", "schedule": {"Mon": "7am-2pm, 4:30-8pm", "Tue": "7am-2pm, 4:30-8pm", "Wed": "7am-2pm, 4:30-8pm", "Thu": "7am-2pm, 4:30-8pm", "Fri": "7am-2pm, 4:30-8pm", "Sat": "8am-7pm (Chick-fil-A closes @ 3 p.m.)", "Sun": "8am-7pm"}, "meal_exchange": "N/A"},
+    {"name": "Credo Kitchen", "schedule": {"Mon": "1pm-12am", "Tue": "1pm-12am", "Wed": "1pm-12am", "Thu": "1pm-12am", "Fri": "1-10pm", "Sat": "-", "Sun": "4pm-12am"}, "meal_exchange": "Yes"},
+    {"name": "The Crimson Panda", "schedule": {"Mon": "10am-6pm", "Tue": "10am-6pm", "Wed": "10am-6pm", "Thu": "10am-6pm", "Fri": "10am-5pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "2-6pm"},
+    {"name": "Crossroads", "schedule": {"Mon": "7:30am-8pm", "Tue": "7:30am-8pm", "Wed": "7:30am-8pm", "Thu": "7:30am-8pm", "Fri": "7:30am-6pm", "Sat": "-", "Sun": "2-8pm"}, "meal_exchange": "Yes"},
+    {"name": "Einstein Bros. Bagels", "schedule": {"Mon": "-", "Tue": "7:30am-1pm", "Wed": "7:30am-1pm", "Thu": "7:30am-1pm", "Fri": "7:30am-1pm", "Sat": "7:30am-1pm", "Sun": "7:30am-1pm"}, "meal_exchange": "Yes"},
+    {"name": "The Flying Cow Cafe", "schedule": {"Mon": "7:30am-3pm", "Tue": "7:30am-3pm", "Wed": "7:30am-3pm", "Thu": "7:30am-3pm", "Fri": "7:30am-3pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "Glow Kitchen", "schedule": {"Mon": "1pm-12am", "Tue": "1pm-12am", "Wed": "1pm-12am", "Thu": "1pm-12am", "Fri": "1-10pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "The Hive", "schedule": {"Mon": "7:30am-3:30pm", "Tue": "7:30am-3:30pm", "Wed": "7:30am-3:30pm", "Thu": "7:30am-3:30pm", "Fri": "7:30am-3:30pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "Jan Marie and Richard J. Crawford University Club", "schedule": {"Mon": "11am-2pm", "Tue": "11am-2pm", "Wed": "11am-2pm", "Thu": "11am-2pm", "Fri": "11am-2pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "Milkflower Gelateria", "schedule": {"Mon": "11am-10pm", "Tue": "11am-10pm", "Wed": "11am-10pm", "Thu": "11am-10pm", "Fri": "1:30-10pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "Pitchfork", "schedule": {"Mon": "5-10pm", "Tue": "5-10pm", "Wed": "5-10pm", "Thu": "5-10pm", "Fri": "5-10pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "Quinos", "schedule": {"Mon": "10am-6pm", "Tue": "10am-6pm", "Wed": "10am-6pm", "Thu": "10am-6pm", "Fri": "10am-5pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "2-6pm"},
+    {"name": "The Range Inside Union Market", "schedule": {"Mon": "10am-6pm", "Tue": "10am-6pm", "Wed": "10am-6pm", "Thu": "10am-6pm", "Fri": "10am-5pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "2-6pm"},
+    {"name": "Residential Colleges' Dining Hall", "schedule": {"Mon": "8am-2pm, 4:30-8pm", "Tue": "8am-2pm, 4:30-8pm", "Wed": "8am-2pm, 4:30-8pm", "Thu": "8am-2pm, 4:30-8pm", "Fri": "8am-2pm, 4:30-8pm", "Sat": "11am-2pm, 4-7pm", "Sun": "11am-2pm, 4-7pm"}, "meal_exchange": "N/A"},
+    {"name": "Starbucks OMU Location", "schedule": {"Mon": "7:30am-8pm", "Tue": "7:30am-8pm", "Wed": "7:30am-8pm", "Thu": "7:30am-8pm", "Fri": "7:30am-6pm", "Sat": "-", "Sun": "2-8pm"}, "meal_exchange": "2-8pm"},
+    {"name": "Sushi with Gusto", "schedule": {"Mon": "11am-10pm (no bowls after 8pm)", "Tue": "11am-10pm (no bowls after 8pm)", "Wed": "11am-10pm (no bowls after 8pm)", "Thu": "11am-10pm (no bowls after 8pm)", "Fri": "11am-10pm (no bowls after 8pm)", "Sat": "-", "Sun": "-"}, "meal_exchange": "Yes"},
+    {"name": "Union Market", "schedule": {"Mon": "10am-6pm", "Tue": "10am-6pm", "Wed": "10am-6pm", "Thu": "10am-6pm", "Fri": "10am-5pm", "Sat": "-", "Sun": "-"}, "meal_exchange": "2-6pm, limited items"},
+    {"name": "Wagner Dining Hall", "schedule": {"Mon": "7-10:30am, 11am-2pm, 4:30-8pm", "Tue": "7-10:30am, 11am-2pm, 4:30-8pm", "Wed": "7-10:30am, 11am-2pm, 4:30-8pm", "Thu": "7-10:30am, 11am-2pm, 4:30-8pm", "Fri": "7am-2pm", "Sat": "-", "Sun": "4:30-8pm"}, "meal_exchange": "N/A"},
+    {"name": "Xcetera", "schedule": {"Mon": "7am-midnight", "Tue": "7am-midnight", "Wed": "7am-midnight", "Thu": "7am-midnight", "Fri": "7am-10pm", "Sat": "11am-10pm", "Sun": "1pm-midnight"}, "meal_exchange": "No"},
+]
+
+# App state
+state = {
+    "screen": "role_selection",  # role_selection, customer, restaurant, driver, restaurant_detail
+    "selected_restaurant": None,
+    "scroll_offset": 0,
+}
+
+# Button class for clickable UI elements
+class Button:
+    def __init__(self, x, y, width, height, text, callback):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.text = font.render(text, True, BLACK)
+        self.text_rect = self.text.get_rect(center=self.rect.center)
+        self.callback = callback
+
+    def draw(self):
+        pygame.draw.rect(screen, GRAY, self.rect)
+        screen.blit(self.text, self.text_rect)
+
+    def check_click(self, pos):
+        if self.rect.collidepoint(pos):
+            self.callback()
+            return True
+        return False
+
+# Create buttons for role selection
+buttons = [
+    Button(100, 200, 200, 50, "Customer", lambda: state.update({"screen": "customer"})),
+    Button(300, 200, 200, 50, "Restaurant", lambda: state.update({"screen": "restaurant"})),
+    Button(500, 200, 200, 50, "Driver", lambda: state.update({"screen": "driver"})),
+]
+
+# Customer screen buttons (restaurants list)
+customer_buttons = [
+    Button(50, 50 + i * 60, 700, 50, restaurant["name"], lambda r=restaurant: state.update({"screen": "restaurant_detail", "selected_restaurant": r}))
+    for i, restaurant in enumerate(restaurants)
+]
+
+# Restaurant screen buttons (restaurants list with links)
+restaurant_buttons = [
+    Button(50, 50 + i * 60, 700, 50, f"{restaurant['name']} (Link)", lambda r=restaurant: print(f"Link for {r['name']} clicked"))
+    for i, restaurant in enumerate(restaurants)
+]
+
+# Back button for navigation
+back_button = Button(50, 500, 200, 50, "Back", lambda: state.update({"screen": "role_selection", "selected_restaurant": None, "scroll_offset": 0}))
+
+# Setup function
+def setup():
+    screen.fill(WHITE)
+
+# Update loop
+def update_loop():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            return
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if state["screen"] == "role_selection":
+                for button in buttons:
+                    button.check_click(event.pos)
+            elif state["screen"] in ["customer", "restaurant"]:
+                if event.button == 1:  # Left click
+                    visible_buttons = (customer_buttons if state["screen"] == "customer" else restaurant_buttons)[max(0, state["scroll_offset"]):state["scroll_offset"] + 8]
+                    for button in visible_buttons:
+                        button.check_click(event.pos)
+                    back_button.check_click(event.pos)
+                elif event.button == 4:  # Scroll up
+                    state["scroll_offset"] = max(0, state["scroll_offset"] - 1)
+                elif event.button == 5:  # Scroll down
+                    state["scroll_offset"] = min(len(restaurants) - 8, state["scroll_offset"] + 1)
+            elif state["screen"] == "restaurant_detail" or state["screen"] == "driver":
+                back_button.check_click(event.pos)
+
+    # Draw based on current screen
+    screen.fill(WHITE)
+    if state["screen"] == "role_selection":
+        title = font.render("Campus Cravings", True, BLACK)
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 100))
+        for button in buttons:
+            button.draw()
+    elif state["screen"] in ["customer", "restaurant"]:
+        title = font.render("Select a Restaurant", True, BLACK)
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 20))
+        visible_buttons = (customer_buttons if state["screen"] == "customer" else restaurant_buttons)[max(0, state["scroll_offset"]):state["scroll_offset"] + 8]
+        for i, button in enumerate(visible_buttons):
+            button.rect.y = 50 + i * 60
+            button.text_rect = button.text.get_rect(center=button.rect.center)
+            button.draw()
+        back_button.draw()
+    elif state["screen"] == "restaurant_detail":
+        restaurant = state["selected_restaurant"]
+        title = font.render(restaurant["name"], True, BLACK)
+        screen.blit(title, (50, 50))
+        y = 100
+        for day, hours in restaurant["schedule"].items():
+            text = font.render(f"{day}: {hours}", True, BLACK)
+            screen.blit(text, (50, y))
+            y += 40
+        text = font.render(f"Meal Exchange: {restaurant['meal_exchange']}", True, BLACK)
+        screen.blit(text, (50, y))
+        back_button.draw()
+    elif state["screen"] == "driver":
+        title = font.render("Orders", True, BLACK)
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 2))
+        back_button.draw()
+
+    pygame.display.flip()
+
+# Main loop
+FPS = 60
+
+async def main():
+    setup()
+    while True:
+        update_loop()
+        await asyncio.sleep(1.0 / FPS)
+
+if platform.system() == "Emscripten":
+    asyncio.ensure_future(main())
+else:
+    if __name__ == "__main__":
+        asyncio.run(main())
