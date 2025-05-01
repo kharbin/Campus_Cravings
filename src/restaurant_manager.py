@@ -123,19 +123,33 @@ class RestaurantManager:
             }
         ]
 
+    from datetime import datetime, time
+
     def is_open(self, schedule, day, current_time):
         hours = schedule.get(day, "-")
         if hours == "-":
             return False
+
         for period in hours.split(", "):
             try:
+                # Split start and end times
                 start, end = period.split("-")
-                start_time = datetime.strptime(start, "%I:%M%p" if ":" in start else "%I%p").time()
-                end_time = datetime.strptime(end, "%I:%M%p" if ":" in end else "%I%p").time()
-                if start_time <= current_time <= end_time:
+
+                # Parse start and end times considering AM/PM
+                start_time = datetime.strptime(start.strip(), "%I:%M%p" if ":" in start else "%I%p").time()
+                end_time = datetime.strptime(end.strip(), "%I:%M%p" if ":" in end else "%I%p").time()
+
+                # Check if current_time is between start_time and end_time
+                if start_time <= current_time < end_time:
                     return True
+
+                # Special case: Handle the case where the end time is on the next day
+                if end_time < start_time and (current_time >= start_time or current_time < end_time):
+                    return True
+
             except ValueError:
-                continue
+                continue  # If there's an error in parsing, skip this period
+
         return False
 
     def is_item_available(self, item, current_time):
