@@ -1,6 +1,9 @@
 import random
 from datetime import datetime
-from ..restaurant_manager import RestaurantManager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+from src.restaurant_manager import RestaurantManager
+
 
 class MealRecommender:
     def __init__(self, restaurant_manager):
