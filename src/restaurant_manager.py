@@ -2,6 +2,7 @@ from datetime import datetime, time
 
 class RestaurantManager:
     def __init__(self):
+        # Use dictionaries to store restaurant names, schedules, meal_exchange, and menu
         self.restaurants = [
             {
                 "name": "Basic Knead",
@@ -153,17 +154,26 @@ class RestaurantManager:
         return False
 
     def is_item_available(self, item, current_time):
+        # Check if a menu item is available based on its availability time
+
         if "available" not in item:
-            return True
+            return True  # If no availability time is specified, assume the item is available
         try:
+            # Split the availability time range (start and end) into start and end time
             start, end = item["available"].split("-")
+            # Convert the start and end times to datetime objects and extract the time part
             start_time = datetime.strptime(start, "%I:%M%p" if ":" in start else "%I%p").time()
             end_time = datetime.strptime(end, "%I:%M%p" if ":" in end else "%I%p").time()
+            # Check if the current time is within the availability range
             return start_time <= current_time <= end_time
         except ValueError:
+            # In case of an error parsing the time, assume the item is available
             return True
 
     def filter_restaurants(self, meal_exchange_filter):
+        # Filter restaurants based on whether they accept meal exchange or not
+
         if not meal_exchange_filter:
-            return self.restaurants
+            return self.restaurants  # If no filter is applied, return all restaurants
+        # Return only restaurants where meal_exchange is not "No" or "N/A"
         return [r for r in self.restaurants if r["meal_exchange"] not in ["No", "N/A"]]
