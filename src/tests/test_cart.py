@@ -37,6 +37,5 @@ class TestCart(unittest.TestCase):
         with self.assertRaises(ValueError):
             Cart("  ")
 
-# ------------------------------- Running the Tests -------------------------------
 if __name__ == "__main__":
     unittest.main()
